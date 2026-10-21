@@ -1,0 +1,23 @@
+# Local Postgres for MiniLedger. The password is for development only.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: miniledger-db
+    environment:
+      POSTGRES_USER: miniledger
+      POSTGRES_PASSWORD: miniledger
+      POSTGRES_DB: miniledger
+    ports:
+      - "5432:5432"
+    volumes:
+      - miniledger_pg:/var/lib/postgresql/data
+      # Creates the test database the first time the volume is initialized.
+      - ./backend/db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U miniledger -d miniledger"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  miniledger_pg:
